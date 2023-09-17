@@ -1,0 +1,58 @@
+# Disable directory browsing
+Options -Indexes
+
+# ----------------------------------------------------------------------
+# Rewrite engine
+# ----------------------------------------------------------------------
+
+# Turning on the rewrite engine is necessary for the following rules and features. - Включение механизма перезаписи необходимо для следующих правил и возможностей.
+# FollowSymLinks must be enabled for this to work. - Чтобы это работало, необходимо включить FollowSymLinks.
+<IfModule mod_rewrite.c>
+	Options +FollowSymlinks
+	RewriteEngine On	
+
+	# If you installed CodeIgniter in a subfolder, you will need to - Если вы установили CodeIgniter в подпапку, вам нужно будет
+	# change the following line to match the subfolder you need. - измените следующую строку, чтобы она соответствовала нужной подпапке.
+	# http://httpd.apache.org/docs/current/mod/mod_rewrite.html#rewritebase
+	# RewriteBase /		
+
+	# Rewrite "www.example.com -> example.com"
+	# Данное условие у нас в любом случае не сработает, так как на сервере установлен ssl сертификат, причем на оба домена: с www и без. А для редиректа с https://www на https:// мы прописали правило в файле .htaccess уровнем выше в корне самого сайта, поэтому документируем нижеуказанное правило
+	#RewriteCond %{HTTPS} !=on
+	#RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+	#RewriteRule ^ http://%1%{REQUEST_URI} [R=301,L]	
+
+	# Redirect Trailing Slashes..
+	RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d	
+  RewriteRule (.+)/$ /$1 [L,R=301]	
+
+	# Checks to see if the user is attempting to access a valid file,
+	# such as an image or css document, if this isn't true it sends the
+	# request to the front controller, index.php
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteCond %{REQUEST_FILENAME} !-d
+	RewriteRule ^([\s\S]*)$ index.php/$1 [L,NC,QSA]	
+
+	# Ensure Authorization header is passed along - Убедитесь, что заголовок авторизации передается
+	RewriteCond %{HTTP:Authorization} .
+	RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+</IfModule>
+<IfModule !mod_rewrite.c>
+	# If we don't have mod_rewrite installed, all 404's
+	# can be sent to index.php, and everything works as normal.
+	ErrorDocument 404 index.php
+</IfModule>
+
+# Disable server signature start
+	ServerSignature Off
+# Disable server signature end
+
+# php -- BEGIN cPanel-generated handler, do not edit
+# Set the “alt-php80” package as the default “PHP” programming language.
+<IfModule mime_module>
+  AddHandler application/x-httpd-alt-php80___lsphp .php .php8 .phtml
+</IfModule>
+# php -- END cPanel-generated handler, do not edit
+
+

@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /assets/
+Disallow: /errors
+Disallow: /bot_logs.txt
+Host: https://duos.by
+Sitemap: http://duos.by/sitemap.xml
